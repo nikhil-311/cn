@@ -1,0 +1,418 @@
+1.Create a table named Employees with the following columns: 
+ employee_id (primary key, auto-increment) 
+ first_name (not null) 
+ last_name (not null) 
+ email (unique, not null) 
+ hire_date (default to the current date) 
+ salary (greater than or equal to 3000) 
+2. Create a sequence employee_seq that starts at 1001 and increments by 1. Use this sequence to 
+insert a new employee record into the Employees table. 
+3. Create a view EmployeeView that shows the employee_id, first_name, last_name, and salary 
+of employees who have a salary greater than or equal to 5000. 
+4. Create an index on the email column of the Employees table to speed up search queries based 
+on email addresses. 
+5. Create a synonym Emp for the Employees table to simplify referencing the table in future 
+queries. 
+6. Add a new table Departments with the columns: 
+ department_id (primary key) 
+ department_name (not null) Then, alter the Employees table to add a foreign key 
+constraint that references department_id from the Departments table. 
+
+
+1.
+
+CREATE TABLE Employees (
+    employee_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    hire_date DATE DEFAULT CURRENT_DATE,
+    salary DECIMAL(10, 2) CHECK (salary >= 3000)
+);
+
+
+2.
+CREATE SEQUENCE employee_seq
+START WITH 1001
+INCREMENT BY 1;
+
+-- Insert a new employee using the sequence for employee_id
+INSERT INTO Employees (employee_id, first_name, last_name, email, salary)
+VALUES (NEXTVAL FOR employee_seq, 'John', 'Doe', 'john.doe@example.com', 5000);
+
+
+3.
+CREATE VIEW EmployeeView AS
+SELECT employee_id, first_name, last_name, salary
+FROM Employees
+WHERE salary >= 5000;
+
+
+4.
+
+CREATE INDEX idx_email ON Employees (email);
+
+5.
+CREATE SYNONYM Emp FOR Employees;
+
+6.
+
+CREATE TABLE Departments (
+    department_id INT PRIMARY KEY,
+    department_name VARCHAR(100) NOT NULL
+);
+
+-- Alter the Employees table to add a foreign key constraint
+ALTER TABLE Employees
+ADD COLUMN department_id INT,
+ADD CONSTRAINT fk_department
+FOREIGN KEY (department_id) REFERENCES Departments(department_id);
+
+
+
+
+
+
+
+2.  
+1. Create a table named Employees with the following columns: 
+ employee_id (primary key, auto-increment) 
+ first_name (not null) 
+ last_name (not null) 
+ email (unique, not null) 
+ hire_date (default to the current date) 
+ salary (greater than or equal to 3000) 
+2. Alter the salary column in the Employees table to increase its size to DECIMAL(15, 2). 
+3. Rename the Employees table to Staff. 
+4. Create a composite index idx_name_salary on the first_name and salary columns in the 
+Employees table to speed up queries that filter on both fields. 
+5. Create a check constraint on the hire_date column of the Employees table to ensure that no 
+employee can have a hire date in the future.
+
+
+
+1.
+CREATE TABLE Employees (
+    employee_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    hire_date DATE DEFAULT CURRENT_DATE,
+    salary DECIMAL(10, 2) CHECK (salary >= 3000)
+);
+
+
+2.
+ALTER TABLE Employees
+MODIFY COLUMN salary DECIMAL(15, 2);
+
+3.
+RENAME TABLE Employees TO Staff;
+
+
+4.
+CREATE INDEX idx_name_salary ON Staff (first_name, salary);
+
+5.
+ALTER TABLE Staff
+ADD CONSTRAINT chk_hire_date CHECK (hire_date <= CURRENT_DATE);
+
+
+
+
+
+
+1. Create the following  tables : 
+ Students (student_id, first_name, last_name, email, department_id, enrollment_date, 
+phone_number) 
+ Departments (department_id, department_name) 
+ Courses (course_id, course_name, department_id, course_fee) 
+ Enrollments (enrollment_id, student_id, course_id, enrollment_date, grade) 
+2. Get a list of all students in the university, showing their first and last names, email, and 
+department name. 
+3. Insert a new student into the Students table. 
+4. Update the email address of the student with student_id = 1002. 
+5. Delete a student record from the Students table where student_id = 1002. 
+6. Retrieve all courses offered by the "Computer Science" department, including the course name 
+and fee. 
+7. Find the names of all students enrolled in the course "Database Systems." 
+8. Insert a new enrollment for student student_id = 1001 in the course course_id = 201, setting 
+the enrollment date to today's date and giving the grade 'A'.
+
+
+
+
+CREATE TABLE Departments (
+    department_id INT PRIMARY KEY,
+    department_name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Students (
+    student_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    department_id INT,
+    enrollment_date DATE DEFAULT CURRENT_DATE,
+    phone_number VARCHAR(15),
+    FOREIGN KEY (department_id) REFERENCES Departments(department_id)
+);
+
+CREATE TABLE Courses (
+    course_id INT PRIMARY KEY AUTO_INCREMENT,
+    course_name VARCHAR(100) NOT NULL,
+    department_id INT,
+    course_fee DECIMAL(10, 2),
+    FOREIGN KEY (department_id) REFERENCES Departments(department_id)
+);
+
+CREATE TABLE Enrollments (
+    enrollment_id INT PRIMARY KEY AUTO_INCREMENT,
+    student_id INT,
+    course_id INT,
+    enrollment_date DATE DEFAULT CURRENT_DATE,
+    grade VARCHAR(2),
+    FOREIGN KEY (student_id) REFERENCES Students(student_id),
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id)
+);
+
+
+
+2.
+SELECT s.first_name, s.last_name, s.email, d.department_name
+FROM Students s
+JOIN Departments d ON s.department_id = d.department_id;
+
+3.
+INSERT INTO Students (first_name, last_name, email, department_id, phone_number)
+VALUES ('Jane', 'Doe', 'jane.doe@example.com', 1, '123-456-7890');
+
+
+4.
+
+UPDATE Students
+SET email = 'newemail@example.com'
+WHERE student_id = 1002;
+
+
+5.
+DELETE FROM Students
+WHERE student_id = 1002;
+
+6.
+SELECT c.course_name, c.course_fee
+FROM Courses c
+JOIN Departments d ON c.department_id = d.department_id
+WHERE d.department_name = 'Computer Science';
+
+7.
+SELECT s.first_name, s.last_name
+FROM Students s
+JOIN Enrollments e ON s.student_id = e.student_id
+JOIN Courses c ON e.course_id = c.course_id
+WHERE c.course_name = 'Database Systems';
+
+8.
+INSERT INTO Enrollments (student_id, course_id, enrollment_date, grade)
+VALUES (1001, 201, CURRENT_DATE, 'A');
+
+
+
+
+1. Create the following  tables : 
+ Students (student_id, first_name, last_name, email, department_id, enrollment_date, 
+phone_number) 
+ Departments (department_id, department_name) 
+ Courses (course_id, course_name, department_id, course_fee) 
+ Enrollments (enrollment_id, student_id, course_id, enrollment_date, grade) 
+2. Update the grade of student student_id = 1001 for the course course_id = 201 to 'B+'. 
+3. Get the number of students enrolled in each course along with the course name. 
+4. Find all students who have not enrolled in any courses. 
+5. Retrieve the first_name, last_name, and email of all students enrolled in the "Mathematics" 
+department. 
+6. Find all courses where the course_fee is greater than 2000, displaying the course name and 
+fee.
+
+1.
+
+
+CREATE TABLE Departments (
+    department_id INT PRIMARY KEY,
+    department_name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Students (
+    student_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    department_id INT,
+    enrollment_date DATE DEFAULT CURRENT_DATE,
+    phone_number VARCHAR(15),
+    FOREIGN KEY (department_id) REFERENCES Departments(department_id)
+);
+
+CREATE TABLE Courses (
+    course_id INT PRIMARY KEY AUTO_INCREMENT,
+    course_name VARCHAR(100) NOT NULL,
+    department_id INT,
+    course_fee DECIMAL(10, 2),
+    FOREIGN KEY (department_id) REFERENCES Departments(department_id)
+);
+
+CREATE TABLE Enrollments (
+    enrollment_id INT PRIMARY KEY AUTO_INCREMENT,
+    student_id INT,
+    course_id INT,
+    enrollment_date DATE DEFAULT CURRENT_DATE,
+    grade VARCHAR(2),
+    FOREIGN KEY (student_id) REFERENCES Students(student_id),
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id)
+);
+
+
+2.
+UPDATE Enrollments
+SET grade = 'B+'
+WHERE student_id = 1001 AND course_id = 201;
+
+3.
+SELECT c.course_name, COUNT(e.student_id) AS num_students
+FROM Courses c
+LEFT JOIN Enrollments e ON c.course_id = e.course_id
+GROUP BY c.course_name;
+
+4.
+SELECT s.first_name, s.last_name, s.email
+FROM Students s
+LEFT JOIN Enrollments e ON s.student_id = e.student_id
+WHERE e.student_id IS NULL;
+
+
+5.
+SELECT s.first_name, s.last_name, s.email
+FROM Students s
+JOIN Departments d ON s.department_id = d.department_id
+WHERE d.department_name = 'Mathematics';
+
+6.
+SELECT c.course_name, c.course_fee
+FROM Courses c
+WHERE c.course_fee > 2000;
+
+
+question 9
+1.Create the students table with the following columns: 
+ student_id (Primary Key, Integer, Auto-increment) 
+ first_name (Varchar, 100 characters) 
+ last_name (Varchar, 100 characters) 
+ birthdate (Date) 
+ email (Varchar, 100 characters, Unique) 
+ enrollment_date (Date) 
+2. Add a column phone_number (Varchar, 15 characters) to the students table. 
+3. Change the data type of the email column from VARCHAR(100) to VARCHAR(255). 
+4. Remove the phone_number column from the students table. 
+5. Rename the enrollment_date column to date_of_enrollment in the students table. 
+6. Create an index on the email column to speed up queries that filter or search by email.  
+7. Drop the entire students table from the database. 
+
+1.
+CREATE TABLE students (
+    student_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    birthdate DATE,
+    email VARCHAR(100) UNIQUE,
+    enrollment_date DATE
+);
+
+2.
+ALTER TABLE students
+ADD COLUMN phone_number VARCHAR(15);
+
+3.
+ALTER TABLE students
+MODIFY COLUMN email VARCHAR(255) UNIQUE;
+
+4.
+ALTER TABLE students
+DROP COLUMN phone_number;
+
+5.
+ALTER TABLE students
+RENAME COLUMN enrollment_date TO date_of_enrollment;
+
+6.
+CREATE INDEX idx_email ON students (email);
+7.
+DROP TABLE students;
+
+
+
+
+question 10
+
+1. Create the students table with the following columns: 
+ student_id (Primary Key, Integer, Auto-increment) 
+ first_name (Varchar, 100 characters) 
+ last_name (Varchar, 100 characters) 
+ email (Varchar, 100 characters) 
+ birthdate (Date) 
+2. Insert a new student into the students table with the following information: 
+ first_name: John 
+ last_name: Doe 
+ email: john.doe@example.com 
+ birthdate: 1998-05-12 
+3. Insert two new students into the students table: 
+1. first_name: Jane, last_name: Smith, email: jane.smith@example.com, birthdate: 2000-08
+22 
+2. first_name: Alice, last_name: Brown, email: alice.brown@example.com, birthdate: 1999
+11-15 
+4. Select all columns from the students table to display all student records. 
+5. Retrieve the first_name, last_name, and email of all students. 
+6. Update the email address of the student with student_id = 1 to john.doe2024@example.com. 
+7. Delete the student record where student_id = 3.
+
+
+1.
+CREATE TABLE students (
+    student_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100),
+    birthdate DATE
+);
+
+2.
+INSERT INTO students (first_name, last_name, email, birthdate)
+VALUES ('John', 'Doe', 'john.doe@example.com', '1998-05-12');
+
+3.
+INSERT INTO students (first_name, last_name, email, birthdate)
+VALUES 
+    ('Jane', 'Smith', 'jane.smith@example.com', '2000-08-22'),
+    ('Alice', 'Brown', 'alice.brown@example.com', '1999-11-15');
+
+4.
+SELECT * FROM students;
+
+5.
+SELECT first_name, last_name, email FROM students;
+6.
+UPDATE students
+SET email = 'john.doe2024@example.com'
+WHERE student_id = 1;
+
+7.
+DELETE FROM students
+WHERE student_id = 3;
+
+
+
+
+
+
+
+
+
+

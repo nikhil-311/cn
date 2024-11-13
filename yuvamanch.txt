@@ -1,0 +1,141 @@
+question no 5 
+
+1.
+db.products.insertOne({
+  name: "Laptop",
+  category: "Electronics",
+  price: 1200,
+  stock: 50
+});
+
+
+2.
+
+db.orders.insertMany([
+  {
+    orderId: 101,
+    customerName: "John Doe",
+    items: [
+      { name: "Laptop", quantity: 1 },
+      { name: "Mouse", quantity: 2 }
+    ],
+    orderDate: new Date("2024-11-01")
+  },
+  {
+    orderId: 102,
+    customerName: "Jane Smith",
+    items: [
+      { name: "Laptop", quantity: 1 },
+      { name: "Keyboard", quantity: 1 }
+    ],
+    orderDate: new Date("2024-11-02")
+  }
+]);
+
+
+3.
+
+db.products.find({
+  category: "Electronics"
+});
+
+
+4.
+
+db.products.find({
+  price: { $gt: 1000 }
+});
+
+
+5.
+db.products.updateOne(
+  { name: "Laptop" },
+  { $set: { stock: 45 } }
+);
+
+
+
+6.
+db.products.updateMany(
+  { category: "Electronics" },
+  { $inc: { stock: 10 } }
+);
+
+
+7.
+
+db.orders.deleteOne({
+  orderId: 101
+});
+
+
+
+
+
+
+question no 6
+
+1.
+db.users.insertOne({
+  name: "Sara Lee",
+  email: "sara.lee@example.com",
+  age: 28,
+  address: { city: "San Francisco", state: "CA" }
+});
+
+
+2.
+db.posts.insertMany([
+  {
+    title: "Introduction to MongoDB",
+    author: "John Doe",
+    content: "This is a blog post introducing MongoDB...",
+    tags: ["database", "NoSQL"],
+    published: true
+  },
+  {
+    title: "Advanced MongoDB Queries",
+    author: "Sara Lee",
+    content: "In this post, we discuss advanced MongoDB queries...",
+    tags: ["database", "queries", "MongoDB"],
+    published: false
+  }
+]);
+
+
+3.
+
+db.users.find({
+  age: { $gt: 30 }
+});
+
+
+
+4.
+
+db.posts.find({
+  published: true
+});
+
+
+
+5.
+
+
+db.users.updateOne(
+  { name: "Sara Lee" },
+  { 
+    $set: { 
+      address: { city: "Los Angeles", state: "CA" } 
+    } 
+  }
+);
+
+
+6.
+db.posts.updateOne(
+  { title: "Introduction to MongoDB" },
+  { 
+    $push: { tags: "Tutorial" } 
+  }
+);
