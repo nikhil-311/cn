@@ -1,0 +1,52 @@
+-- Procedure command/block
+-- concepts to implement - procedure
+
+--1 create and use database
+CREATE DATABASE IF NOT EXISTS mydata;
+USE mydata;
+
+--2 create two tables: borrower and fine
+CREATE TABLE borrower(Roll_in INT PRIMARY KEY, name VARCHAR(20), dateofissue DATE, bname VARCHAR(20), status CHAR(1) NOT NULL);
+CREATE TABLE fine(roll_no INT, Fdate DATE, amt INT, FOREIGN KEY(roll_no) REFERENCES borrower(Roll_in));
+
+--3 show schema
+DESC borrower;
+DESC fine;
+
+--4 insert some data into borrower
+INSERT INTO borrower VALUES(1,'A','2024-10-24','DBMS','I');
+INSERT INTO borrower VALUES(2,'B','2024-01-10','AI','I');
+INSERT INTO borrower VALUES(3,'C','2024-09-09','CG','I');
+INSERT INTO borrower VALUES(4,'D','2024-08-15','CN','I');
+INSERT INTO borrower VALUES(5,'E','2024-05-11','WT','I');
+
+--5 create procedure
+-- (Note: once you use DELIMITER, every query should end with space and //)
+
+DELIMITER //
+CREATE PROCEDURE calc(IN roll INT, IN book VARCHAR(20))
+BEGIN
+DECLARE i_date DATE;
+DECLARE diff INT;
+DECLARE fine_amt INT;
+DECLARE exit handler for sqlexception SELECT 'Table Not Found';
+SELECT dateofissue INTO i_date FROM borrower WHERE roll=Roll_in AND book=bname;
+SELECT DATEDIFF(CURDATE(),i_date) INTO diff;
+if(diff>15 AND diff<=30) THEN
+SET fine_amt=diff*5;
+INSERT INTO fine VALUES(roll,CURDATE(),fine_amt);
+ELSEIF(diff>30) THEN
+SET fine_amt=15*5+(diff-30)*50;
+INSERT INTO fine VALUES(roll,CURDATE(),fine_amt);
+END IF;
+UPDATE borrower SET status='R' WHERE roll=Roll_in AND book=bname;
+END; //
+
+--6 call the procedure
+CALL calc(2,'AI');
+//
+--7 show the results
+SELECT * FROM borrower;
+//
+SELECT * FROM fine;
+//
