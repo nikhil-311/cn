@@ -1,0 +1,42 @@
+int buzzpin = 7;
+int trigPin = 6;
+int echoPin = A0;
+int IRPin=A1;
+int IRV;
+int duration, distance;
+
+void setup()
+{
+  pinMode(trigPin, OUTPUT);
+  pinMode(buzzpin, OUTPUT);
+  pinMode(echoPin, INPUT);
+pinMode (IRPin, INPUT);
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.034 / 2;
+  Serial.print("Distance in cm is: ");
+  Serial.println(distance);
+  if (distance < 20)
+  {
+    digitalWrite(buzzpin, HIGH);
+  }
+  else
+  {
+    digitalWrite(buzzpin, LOW);
+  }
+  delay(100);
+  IRV= digitalRead(IRPin);
+ 
+ Serial.print("IR sensor Value:");
+  Serial.println(IRV);
+  delay(1000);
+}

@@ -1,0 +1,32 @@
+const int PIR_SENSOR_OUTPUT_PIN = 4;  // PIR sensor O/P pin
+const int LED_PIN = 13;               // LED pin (D13 on Arduino)
+int warm_up = 0;                      // Initialize warm_up
+
+void setup() {
+  pinMode(PIR_SENSOR_OUTPUT_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);           // Set LED as output
+  Serial.begin(9600);                 // Serial communication
+  delay(2000);                        // Warm-up delay for PIR
+}
+
+void loop() {
+  int sensor_output = digitalRead(PIR_SENSOR_OUTPUT_PIN);
+
+  if (sensor_output == LOW) {
+    // No motion detected
+    if (warm_up == 1) {
+      Serial.println("Warming Up");
+      warm_up = 0;
+      delay(2000);
+    }
+    digitalWrite(LED_PIN, LOW);       // Turn OFF LED
+    Serial.println("No object in sight");
+    delay(1000);
+  } else {
+    // Motion detected
+    Serial.println("Object detected");
+    digitalWrite(LED_PIN, HIGH);      // Turn ON LED
+    warm_up = 1;
+    delay(1000);
+  }
+}
