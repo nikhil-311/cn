@@ -1,0 +1,647 @@
+cd ~/hadoop/sbin
+
+./start-dfs.sh
+./start-yarn.sh
+
+jps
+
+
+mkdir practical1
+cd practical1
+
+
+nano input.txt
+
+{ Paste content.
+Save:
+Ctrl + O
+Enter
+Ctrl + X }
+
+
+nano mapper.py
+
+nano reducer.py
+
+chmod +x mapper.py reducer.py
+
+hdfs dfs -mkdir -p /input
+
+hdfs dfs -put input.txt /input
+
+hdfs dfs -rm -r /output
+
+
+find / -name "hadoop-streaming*.jar" 2>/dev/null
+
+
+( use above output path after Hadoop jar /---- )
+
+
+hadoop jar /path/to/hadoop-streaming.jar \       
+-file mapper.py \
+-file reducer.py \
+-mapper "python3 mapper.py" \
+-reducer "python3 reducer.py" \
+-input /input/input.txt \
+-output /output
+
+
+hdfs dfs -cat /output/part-00000
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+==================<>=======================<>===========================
+
+1st practical word counting
+
+mapper.py 
+
+import sys
+for line in sys.stdin:
+    line = line.strip()
+    words = line.split()
+
+    for word in words:
+        print(word + "\t1")
+
+
+
+
+reducer.py
+
+
+import sys
+current_word = None
+current_count = 0
+
+for line in sys.stdin:
+    line = line.strip()
+
+    word, count = line.split('\t')
+    count = int(count)
+
+    if current_word == word:
+        current_count += count
+    else:
+        if current_word:
+            print(current_word + "\t" + str(current_count))
+
+        current_word = word
+        current_count = count
+
+if current_word:
+    print(current_word + "\t" + str(current_count))
+
+
+
+input.txt
+hello world welcome to the world of big data hello
+
+
+
+
+
+
+
+
+
+
+============================<>====================================<>=================
+
+
+
+2nd MATRIX MULTIPLICATION
+
+
+mapper.py
+
+
+import sys
+
+for line in sys.stdin:
+
+    tokens = line.strip().split(',')
+
+    if tokens[0] == 'A':
+
+        for k in range(0, 2):
+
+            print(f"{tokens[1]},{k}\tA,{tokens[2]},{tokens[3]}")
+
+    elif tokens[0] == 'B':
+
+        for i in range(0, 2):
+
+            print(f"{i},{tokens[2]}\tB,{tokens[1]},{tokens[3]}")
+
+
+
+
+
+reducer.py
+
+
+import sys
+from collections import defaultdict
+
+current_key = None
+
+A_vals = defaultdict(float)
+B_vals = defaultdict(float)
+
+for line in sys.stdin:
+
+    key, value = line.strip().split('\t')
+
+    matrix, index, val = value.split(',')
+
+    if current_key and current_key != key:
+
+        result = sum(
+            A_vals[k] * B_vals[k]
+            for k in A_vals
+            if k in B_vals
+        )
+
+        print(f"{current_key}\t{result}")
+
+        A_vals.clear()
+        B_vals.clear()
+
+    current_key = key
+
+    if matrix == 'A':
+        A_vals[index] = float(val)
+
+    else:
+        B_vals[index] = float(val)
+
+if current_key:
+
+    result = sum(
+        A_vals[k] * B_vals[k]
+        for k in A_vals
+        if k in B_vals
+    )
+
+    print(f"{current_key}\t{result}")
+
+
+
+
+
+input.txt
+
+A,0,0,1
+A,0,1,2
+A,1,0,3
+A,1,1,4
+B,0,0,5
+B,1,0,6
+B,0,1,7
+B,1,1,8
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+========================<>=======================<>==========================<>======
+
+
+
+# 3rd practical students grades
+
+mapper.py
+
+
+
+import sys
+for line in sys.stdin:
+
+    line = line.strip()
+
+
+    if line:
+        name, marks = line.split(',')
+        print(f"{name}\t{marks}")
+
+
+
+
+
+reducer.py
+
+
+
+import sys
+
+# Read mapper output
+for line in sys.stdin:
+    name, marks = line.strip().split('\t')
+    marks = int(marks)
+
+    # Apply grading logic
+    if marks >= 90:
+        grade = 'A'
+
+    elif marks >= 80:
+        grade = 'B'
+
+    elif marks >= 70:
+        grade = 'C'
+
+    elif marks >= 60:
+        grade = 'D'
+
+    else:
+        grade = 'F'
+
+    print(f"{name}\t{grade}")
+
+
+
+
+input.txt
+
+Alice,85
+Bob,67
+Charlie,92
+David,74
+Eva,58
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=========================<>=========================<>==========================<>===========================
+
+
+MONGO DB ALL CODES 
+
+Step 1: Install MongoDB (on Ubuntu) 
+sudo systemctl start mongodb 
+sudo systemctl enable mongodb 
+
+Step 2: Start MongoDB Shell 
+mongosh 
+
+
+
+
+
+
+
+1) The AI  & DS Department of a college wants to digitize and manage student data using a NoSQL 
+database. As a developer, build a application to manage student records. Each student record 
+should include details such as roll number, name, branch, year, and marks.
+
+use collegeDB
+
+db.createCollection("students")
+
+db.students.insertOne({roll_no: "CSE001", name: "Gaurav K", branch:"CSE", year: 2, marks: 90})
+
+db.students.insertMany([{roll_no: "CSE002", name: "Atharv K", branch:"CSE", year: 3, marks: 86},{roll_no: "CSE003", name: "Vijay B", branch:"CSE", year: 2, marks: 67} ])
+
+db.students.find().pretty()
+
+db.students.updateOne({roll_no:"CSE001"} , {$set:{marks:93}}
+
+db.students.deleteOne({roll_no:"CSE003"})
+
+sorting
+db.students.find().sort({marks:-1}) 
+
+projection
+db.students.find({},{name:1,marks:1,_id:0})
+
+db.students.find().limit(1)
+
+ db.students.aggregate([ { $group: {_id:"$year",avg_marks:{$avg:"$marks"}}}])
+
+
+
+
+
+
+
+
+
+
+
+
+
+2) A company wants to shift its employee record system from spreadsheets to a NoSQL database. 
+As a software engineer, you are required to create and manage employee records using 
+MongoDB. Each employee's information should include Employee ID, Name, Department, 
+Designation, and Salary. 
+
+
+ use companyDB
+
+db.createCollection("employee")
+
+db.employee.insertOne({emp_id:"EMP001",name:"lokesh B",department:"HR",designation:"manager",salary:65000})
+
+
+
+ db.employee.insertMany([{emp_id:"EMP002",name:"Darshan S",department:"Developer",designation:"SDE1",salary:55000},{emp_id:"EMP003",name:"Rushi D",department:"Analyst",designation:"SDE1",salary:45000}])
+
+
+db.employee.find().pretty()
+
+db.employee.find({salary:{$gt:60000}})
+
+db.employee.updateOne({ emp_id:"EMP001" }, { $set: { salary : 67000 } } )
+
+db.employee.deleteOne({emp_id:"EMP003"})
+
+
+
+
+
+
+
+
+
+
+
+
+
+3) A college library wants to maintain a digital database of books instead of keeping handwritten 
+registers. As a backend developer, you are assigned to develop a MongoDB-based system to 
+manage books. Each book entry should include a Book ID, Title, Author, Category, and 
+Availability status. 
+
+
+
+use LibraryDB
+db.createCollection("Books") 
+
+db.Books.insertMany([ 
+{ 
+book_id: "B001", 
+title: "Database Systems", 
+author: "Raghu Ramakrishnan", 
+category: "Computer Science", 
+available: true 
+}, 
+{ 
+book_id: "B002", 
+title: "Clean Code", 
+author: "Robert C. Martin", 
+category: "Programming", 
+available: false 
+}, 
+{ 
+book_id: "B003", 
+title: "Introduction to Algorithms", 
+author: "Cormen et al.", 
+category: "Algorithms", 
+available: true 
+} 
+]) 
+
+
+
+db.Books.find().pretty() 
+
+db.Books.find({ available: true })
+
+db.Books.updateOne( 
+{ book_id: "B002" }, 
+{ $set: { available: true } } 
+) 
+
+
+db.Books.deleteOne({ book_id: "B003" }) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4) An e-commerce startup wants to build a product catalog database to store and manage product 
+information. As a database developer, your task is to use MongoDB to:
+
+use ProductDB
+
+db.createCollection("Products")
+
+db.Products.insertMany([
+{
+    productid: 101,
+    name: "Laptop",
+    category: "Electronics",
+    price: 65000,
+    stock: 10
+},
+{
+    productid: 102,
+    name: "Smartphone",
+    category: "Electronics",
+    price: 30000,
+    stock: 25
+},
+{
+    productid: 103,
+    name: "Shoes",
+    category: "Fashion",
+    price: 2500,
+    stock: 40
+},
+{
+    productid: 104,
+    name: "Watch",
+    category: "Accessories",
+    price: 5000,
+    stock: 15
+},
+{
+    productid: 105,
+    name: "Headphones",
+    category: "Electronics",
+    price: 3500,
+    stock: 20
+},
+{
+    productid: 106,
+    name: "T-Shirt",
+    category: "Fashion",
+    price: 1200,
+    stock: 50
+}
+])
+
+
+db.Products.find().pretty()
+
+db.Products.find({price: {$gt: 5000}})
+
+
+db.Products.find({category: "Electronics"})
+
+db.Products.updateOne(
+    {productid: 105},
+    {$set: {price: 4000}}
+)
+
+
+db.Products.deleteOne({productid: 106})
+
+
+db.Products.find().sort({price: 1})
+db.Products.find().sort({price: -1})
+
+
+db.Products.find(
+    {},
+    {name: 1, price: 1, _id: 0}
+)
+
+
+db.Products.find().limit(3)
+
+db.Products.find().sort({price: -1}).limit(2)
+
+db.Products.aggregate([{$group:{_id: "$category" ,average_price:{$avg:"$price"}} }])
+
+
+
+
+======================================<>============================<>============================<>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=============<>+++++++++<>======================================
+
+BI 5th practical  
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.datasets import load_iris
+
+from sklearn.model_selection import train_test_split
+
+from sklearn.preprocessing import StandardScaler
+
+from sklearn.ensemble import RandomForestClassifier
+
+from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
+
+df = load_iris()
+
+X = df.data
+y = df.target
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = RandomForestClassifier()
+
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+print("Accuracy: ",accuracy_score(y_test, y_pred)*100)
+
+cm = confusion_matrix(y_test, y_pred)
+
+sns.heatmap(cm, annot=True, fmt='d')
+
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
