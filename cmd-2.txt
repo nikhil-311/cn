@@ -1,0 +1,233 @@
+BDA Experiment 2 — Matrix Multiplication using MapReduce
+(Complete Step-by-Step in REAL Hadoop)
+From your manual: 
+
+SIMPLE UNDERSTANDING FIRST
+We multiply:
+Matrix A
+1 2
+3 4
+and
+Matrix B
+5 7
+6 8
+Result becomes:
+17 23
+39 53
+
+HOW HADOOP HELPS
+Hadoop:
+* calculates each matrix cell separately 
+* processes in parallel using MapReduce 
+
+STEP 1 — Open Ubuntu Terminal
+Shortcut:
+Ctrl + Alt + T
+
+STEP 2 — Start Hadoop Services
+Run:
+start-dfs.sh
+Then:
+start-yarn.sh
+
+STEP 3 — Verify Hadoop Running
+Run:
+jps
+Expected:
+NameNode
+DataNode
+SecondaryNameNode
+ResourceManager
+NodeManager
+
+STEP 4 — Create Project Folder
+Run:
+mkdir matrix_multiplication
+Go inside folder:
+cd matrix_multiplication
+
+STEP 5 — Create Matrix A File
+Run:
+nano a.csv
+Paste this from manual: 
+A,0,0,1
+A,0,1,2
+A,1,0,3
+A,1,1,4
+Save:
+* CTRL + O 
+* Enter 
+* CTRL + X 
+
+STEP 6 — Create Matrix B File
+Run:
+nano b.csv
+Paste:
+B,0,0,5
+B,1,0,6
+B,0,1,7
+B,1,1,8
+Save:
+* CTRL + O 
+* Enter 
+* CTRL + X 
+
+STEP 7 — Create mapper.py
+Run:
+nano mapper.py
+Paste:
+#!/usr/bin/env python3
+
+import sys
+
+for line in sys.stdin:
+
+    tokens = line.strip().split(',')
+
+    if tokens[0] == 'A':
+
+        for k in range(0, 2):
+
+            print(f"{tokens[1]},{k}\tA,{tokens[2]},{tokens[3]}")
+
+    elif tokens[0] == 'B':
+
+        for i in range(0, 2):
+
+            print(f"{i},{tokens[2]}\tB,{tokens[1]},{tokens[3]}")
+Save:
+* CTRL + O 
+* Enter 
+* CTRL + X 
+
+STEP 8 — Create reducer.py
+Run:
+nano reducer.py
+Paste:
+#!/usr/bin/env python3
+
+import sys
+from collections import defaultdict
+
+current_key = None
+
+A_vals = defaultdict(float)
+B_vals = defaultdict(float)
+
+for line in sys.stdin:
+
+    key, value = line.strip().split('\t')
+
+    matrix, index, val = value.split(',')
+
+    if current_key and current_key != key:
+
+        result = sum(
+            A_vals[k] * B_vals[k]
+            for k in A_vals if k in B_vals
+        )
+
+        print(f"{current_key}\t{result}")
+
+        A_vals.clear()
+        B_vals.clear()
+
+    current_key = key
+
+    if matrix == 'A':
+        A_vals[index] = float(val)
+
+    else:
+        B_vals[index] = float(val)
+
+if current_key:
+
+    result = sum(
+        A_vals[k] * B_vals[k]
+        for k in A_vals if k in B_vals
+    )
+
+    print(f"{current_key}\t{result}")
+Save:
+* CTRL + O 
+* Enter 
+* CTRL + X 
+
+STEP 9 — Give Execution Permission
+Run:
+chmod +x mapper.py
+chmod +x reducer.py
+
+STEP 10 — Create HDFS Input Folder
+Run:
+hdfs dfs -mkdir /matrix_input
+
+STEP 11 — Upload Matrix Files
+Run:
+hdfs dfs -put a.csv /matrix_input
+Then:
+hdfs dfs -put b.csv /matrix_input
+
+STEP 12 — Verify Upload
+Run:
+hdfs dfs -ls /matrix_input
+Expected:
+* a.csv 
+* b.csv 
+
+STEP 13 — Run Hadoop MapReduce Job
+MOST IMPORTANT COMMAND:
+hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar \
+-files mapper.py,reducer.py \
+-mapper mapper.py \
+-reducer reducer.py \
+-input /matrix_input \
+-output /matrix_output
+Wait until Hadoop finishes.
+
+STEP 14 — View Final Output
+Run:
+hdfs dfs -cat /matrix_output/part-00000
+
+EXPECTED OUTPUT
+From manual: 
+0,0    17.0
+0,1    23.0
+1,0    39.0
+1,1    53.0
+
+IMPORTANT ERROR FIX
+If Output Folder Already Exists
+Run:
+hdfs dfs -rm -r /matrix_output
+Then rerun STEP 13.
+
+VERY SIMPLE EXPLANATION
+Mapper Does
+Mapper:
+* sends matrix values 
+* identifies result matrix positions 
+
+Reducer Does
+Reducer:
+* multiplies matching values 
+* adds results together 
+
+SUPER IMPORTANT Viva Questions
+What is matrix multiplication?
+Matrix multiplication combines rows of one matrix with columns of another matrix.
+
+What does Mapper do?
+Mapper emits key-value pairs representing positions in the result matrix.
+
+What does Reducer do?
+Reducer performs multiplication and summation to compute final matrix values.
+
+Why use MapReduce for matrix multiplication?
+MapReduce enables parallel computation of matrix operations on large datasets.
+
+Important Commands To Remember
+PurposeCommandUpload fileshdfs dfs -putRun MapReducehadoop jar ...View outputhdfs dfs -catDelete outputhdfs dfs -rm -r
+Journal Conclusion
+Thus, matrix multiplication was successfully implemented using MapReduce in Hadoop.
+
