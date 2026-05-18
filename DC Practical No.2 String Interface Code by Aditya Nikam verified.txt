@@ -1,0 +1,17 @@
+This code is called a Remote Interface in Java RMI.
+Remote Method Invocation(RMI) means A program running on one computer can call methods(functions) of another program running on another computer.
+
+import java.rmi.Remote;#java.rmi.Remote is built in module in Java used for remote communication in which a program from one computer can #access the method(functions) from the another computer on different computer through a network
+
+import java.rmi.RemoteException;#It is a built in module of Java to deal with any errors that many arise during remote communication.
+#Suppose If Client sends a requests to Server but Server is not running it is off then the program would not crash instead an error message 
+#like "Network error" or "Server not found error" would come.Or if Client and Server both are running and if suddenly the Internet gets disconnected then also instead of the program getting crashed an error message would come like "Network error"
+
+#You may be wondering that what if we dont write "import java.rmi.RemoteException"so see then in that case your program will not be
+#compiled and you will get an error because remote communication is unpredictable as network may get disconnected anytime so
+#Java excepts developers to prepare for failures as well
+
+public interface StringInterface extends Remote
+{
+    String concatenate(String a, String b) throws RemoteException;
+}

@@ -1,0 +1,31 @@
+import java.rmi.Naming;
+import java.util.Scanner;
+
+public class Client
+{
+    public static void main(String[] args)
+    {
+        try
+        {
+            StringInterface obj;
+
+            obj = (StringInterface) Naming.lookup("rmi://localhost/StringService");
+
+            Scanner sc = new Scanner(System.in);
+
+            System.out.print("Enter first string: ");
+            String s1 = sc.nextLine();
+
+            System.out.print("Enter second string: ");
+            String s2 = sc.nextLine();
+
+            String result = obj.concatenate(s1, s2);
+
+            System.out.println("Concatenated String: " + result);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+}

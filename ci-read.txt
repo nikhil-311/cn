@@ -1,0 +1,23 @@
+Practical 1 — Fuzzy Set Operations
+
+Implement Union, Intersection, Complement and Difference operations on fuzzy sets. Also create fuzzy relations by Cartesian product of any two fuzzy sets and perform max-min composition on any two fuzzy relations.
+
+Practical 2 — Clonal Selection Algorithm (CLONALG)
+
+To implement the Clonal Selection Algorithm (CLONALG) in Python, simulating the working of an artificial immune system for solving optimization problems.
+
+Practical 3 — Artificial Immune Pattern Recognition
+
+Application of Artificial Immune Pattern Recognition for Structural Damage Classification.
+
+OR
+
+To apply Artificial Immune System (AIS)-based pattern recognition methods for classifying structural damage in engineering structures by mimicking the human immune system's learning and recognition capabilities.
+
+Practical 4 — DEAP (Distributed Evolutionary Algorithms)
+
+Implement DEAP (Distributed Evolutionary Algorithms) using Python.
+
+Practical 5 — Ant Colony Optimization (ACO)
+
+Implement Ant Colony Optimization by solving the Traveling Salesman Problem using Python. A salesman needs to visit a set of cities exactly once and return to the original city. The task is to find the shortest possible route that the salesman can take to visit all the cities and return to the starting city.

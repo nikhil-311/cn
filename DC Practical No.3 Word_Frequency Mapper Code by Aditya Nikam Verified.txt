@@ -1,0 +1,21 @@
+Title: Design a distributed application using MapReduce under Hadoop for:b) Counting no. of occurrences of every word in a given text 
+file.
+
+#!/usr/bin/env python3
+import sys
+import re
+
+# Read each line from standard input
+for line in sys.stdin:
+    # Remove leading and trailing whitespace
+    line = line.strip()
+
+    # Replace punctuation with spaces to prevent words sticking together
+    line = re.sub(r'[^\w\s]', ' ', line)
+
+    # Split the line into individual words
+    words = line.split()
+
+    # Emit each word and a '1', separated by a tab
+    for word in words:
+        print(f"{word}\t1")

@@ -1,0 +1,17 @@
+Title: Design a distributed application using MapReduce under Hadoop for: a) Character 
+counting in a given text file.
+
+#!/usr/bin/env python3
+import sys
+
+# Read each line from standard input
+for line in sys.stdin:
+    # Remove leading/trailing whitespace
+    line = line.strip()
+
+    # Loop through every single character in the line
+    for char in line:
+        # Ignore empty spaces
+        if char != " ":
+            # Print the character and a '1'
+            print(f"{char}\t1")

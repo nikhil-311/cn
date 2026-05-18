@@ -1,0 +1,33 @@
+import java.rmi.Naming;
+import java.rmi.server.UnicastRemoteObject;
+import java.rmi.RemoteException;
+
+public class Server extends UnicastRemoteObject implements StringInterface
+{
+
+    public Server() throws RemoteException
+    {
+        super();
+    }
+
+    public String concatenate(String a, String b)
+    {
+        return a + b;
+    }
+
+    public static void main(String[] args)
+    {
+        try
+        {
+            Server server = new Server();
+
+            Naming.rebind("rmi://localhost/StringService", server);
+
+            System.out.println("Server is running...");
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+}
